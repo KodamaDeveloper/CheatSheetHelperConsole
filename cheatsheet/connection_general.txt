@@ -1,0 +1,75 @@
+#### SSH Connections
+ssh $user@$target_ip
+ssh -p 2222 $user@$target_ip
+ssh -i data/private_key $user@$target_ip
+ssh -X $user@$target_ip
+ssh -v $user@$target_ip
+ssh -o ProxyCommand="ssh -W %h:%p $user@proxy_ip" $user@$target_ip
+
+#### FTP Connections
+ftp $target_ip
+ftp -p -n $target_ip
+quote USER $user
+quote PASS $password
+ftp -p $target_ip
+ncftp $target_ip
+lftp -u $user,$password $target_ip
+
+#### SFTP Connections
+sftp $user@$target_ip
+sftp -P 2222 $user@$target_ip
+sftp -i data/private_key $user@$target_ip
+
+#### SMB Connections
+smbclient -L //$target_ip
+smbclient //$target_ip/share -U $user
+sudo mount -t cifs //$target_ip/share /mnt/smb -o username=$user,password=$password
+
+#### RDP Connections
+rdesktop $target_ip
+rdesktop -g 1024x768 $target_ip
+rdesktop -f $target_ip
+rdesktop -u $user -p $password $target_ip
+
+#### VNC Connections
+vncviewer $target_ip
+vncviewer $target_ip:5901
+vncviewer $target_ip -passwd data/$file_password_for_vncviewer
+
+#### Telnet Connections
+telnet $target_ip
+telnet $target_ip 2323
+
+#### Database Connections
+mysql -h $target_ip -u $user -p
+psql -h $target_ip -U $user -d $database
+sqsh -S $target_ip -U $user
+mongo $target_ip
+
+#### LDAP Connections
+ldapsearch -x -h $target_ip
+ldapsearch -x -h $target_ip -b "dc=$domain"
+
+#### SNMP Connections
+snmpwalk -v2c -c public $target_ip
+snmpwalk -v2c -c private $target_ip
+
+#### HTTP Connections
+curl http://$target_ip
+curl -X POST -d "$param1=$value1&$param2=$value2" http://$target_ip
+wget http://$target_ip
+
+#### HTTPS Connections
+curl https://$target_ip
+curl -X POST -d "param1=$value1&$param2=$value2" https://$target_ip
+wget https://$target_ip
+
+#### Miscellaneous Connections
+redis-cli -h $target_ip
+telnet $target_ip 11211
+irssi -c $target_ip
+openssl s_client -connect $target_ip:993
+openssl s_client -connect $target_ip:995
+openssl s_client -connect $target_ip:465
+showmount -e $target_ip
+sudo mount -t nfs $target_ip:/export /mnt/$folder_nfs

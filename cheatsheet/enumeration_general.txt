@@ -1,0 +1,95 @@
+#### Basic Network Enumeration
+ping -c 4 $target_ip
+traceroute $target_ip
+netstat -tuln
+netdiscover -r $local_network_range
+
+#### DNS Enumeration
+host $domain
+nslookup $domain
+dig $domain
+dig axfr $domain @$dns_server
+dnsenum $domain
+
+#### SMB Enumeration
+smbclient -L //$target_ip -N
+smbclient //$target_ip/share -U user%password
+enum4linux -a $target_ip
+smbmap -H $target_ip
+
+#### HTTP Enumeration
+curl -I $url
+wget -qO- $url
+whatweb $url
+dirb $url
+gobuster dir -u $url -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+
+#### FTP Enumeration
+ftp $target_ip
+ncftp $target_ip
+lftp $target_ip
+ncrack -p 21 --user admin -P /usr/share/wordlists/rockyou.txt $target_ip
+
+#### SNMP Enumeration
+snmpwalk -v 2c -c public $target_ip
+snmpcheck -t $target_ip -c public
+onesixtyone $target_ip
+snmpenum $target_ip
+
+#### SSH Enumeration
+ssh $target_ip
+ssh-keyscan $target_ip
+ncrack -p 22 --user root -P /usr/share/wordlists/rockyou.txt $target_ip
+
+#### MySQL Enumeration
+mysql -h $target_ip -u root -p
+mysqlshow -h $target_ip -u root -p
+mysqladmin -h $target_ip -u root -p status
+
+#### MSSQL Enumeration
+sqsh -S $target_ip -U sa
+mssqlclient.py sa@target_ip -windows-auth
+impacket-mssqlclient sa@$target_ip -windows-auth
+
+#### LDAP Enumeration
+ldapsearch -x -h $target_ip -s base
+ldapsearch -x -h $target_ip -b "dc=example,dc=com"
+enum4linux -a $target_ip
+
+#### SMTP Enumeration
+smtp-user-enum -M VRFY -U /usr/share/wordlists/usernames.txt -t $target_ip
+nmap --script smtp-enum-users -p 25 $target_ip
+swaks --to user@$domain --from admin@$domain --server $target_ip
+
+#### NetBIOS Enumeration
+nmblookup -A $target_ip
+nbtscan $target_ip
+nbtscan -r $local_network_range
+
+#### SNMP Enumeration
+snmpwalk -v1 -c public $target_ip
+snmp-check $target_ip
+onesixtyone $target_ip public
+
+#### Web Server Enumeration
+whatweb $url
+wafw00f $url
+nikto -h $url
+wpscan --url $url
+
+#### Database Enumeration
+sqlmap -u $url --dbs
+sqlmap -u $url --tables -D $database
+sqlmap -u $url --columns -T $table -D $database
+
+#### Miscellaneous Enumeration
+ike-scan $target_ip
+rpcinfo -p $target_ip
+showmount -e $target_ip
+finger @$target_ip
+
+#### Local Network Enumeration
+arp-scan -l
+netdiscover -r $local_network_range
+arping $local_ip
+ip neigh

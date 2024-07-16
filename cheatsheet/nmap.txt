@@ -1,0 +1,124 @@
+#### Basic Scans
+nmap -Pn -n -vvv $target_ip
+nmap -Pn -n -vvv -p1-500 $target_ip
+nmap -Pn -n -vvv -p- $target_ip
+nmap -Pn -n -vvv -p22,80 $target_ip
+sudo nmap -Pn -n -vvv -sU $target_ip
+
+#### Aggressive Scans
+nmap -A $target_ip
+nmap -O $target_ip
+nmap -sV $target_ip
+nmap -sS $target_ip
+sudo nmap -sS -sU $target_ip
+
+#### Timing and Performance
+nmap -T4 $target_ip
+nmap -T0 $target_ip
+
+#### NSE Script Scanning
+nmap -sC $target_ip
+nmap --script=vuln $target_ip
+nmap --script=http-enum $target_ip
+nmap --script=ftp-anon $target_ip
+nmap --script=ssl-cert $target_ip
+
+#### Domain Scans
+nmap -Pn -n -vvv $domain
+nmap -A $domain
+nmap -sV $domain
+nmap -sS $domain
+nmap --script=vuln $domain
+nmap --script=http-enum $domain
+nmap --script=ssl-cert $domain
+
+#### Output Formats
+nmap -oN data/output.txt $target_ip
+nmap -oX data/output.xml $target_ip
+nmap -oA data/output $target_ip
+
+#### Firewall Evasion and Spoofing
+nmap -f $target_ip
+nmap --mtu 24 $target_ip
+nmap -D RND:10 $target_ip
+nmap -S $spoof_ip $target_ip
+nmap -e eth0 $target_ip
+
+#### Miscellaneous
+nmap -6 $target_ip
+nmap --traceroute $target_ip
+nmap --spoof-mac $mac_address $target_ip
+nmap -n $target_ip
+
+#### Specific Examples
+nmap 192.168.1.1
+nmap 192.168.1.1-254
+nmap 192.168.1.0/24
+nmap -iL data/$list_of_ips_txt
+
+#### Custom Scans
+nmap -sT -p 80,443 $target_ip
+sudo nmap -sU -p 53,161 $target_ip
+nmap -sO $target_ip
+
+#### NSE Vulnerability Scans
+nmap --script smb-vuln-ms17-010 -p445 $target_ip
+nmap --script http-vuln-cve2017-5638 -p80 $target_ip
+nmap --script ssl-poodle -p443 $target_ip
+nmap --script sshv1 -p22 $target_ip
+nmap --script dns-zone-transfer -p53 --script-args dns-zone-transfer.server=$target_ip
+
+#### Service Version Detection
+nmap -sV --version-intensity 5 $target_ip
+nmap -sV --version-all $target_ip
+nmap -sV --version-light $target_ip
+
+#### Comprehensive Scan
+nmap -A -T4 $target_ip
+
+#### Scan and Save Output in All Formats
+nmap -oA data/full_scan $target_ip
+
+#### Local Network Scans
+nmap -sP 192.168.1.0/24
+nmap -sP 10.0.0.0/24
+nmap -sP 172.16.0.0/24
+
+#### Custom Ports Scans
+nmap -p 80,443,8080 $target_ip
+nmap -p 21,22,23,25,80,110,139,443,445,3389 $target_ip
+nmap -p 1-1024 $target_ip
+nmap -p- $target_ip
+
+#### Nmap Scripting Engine (NSE) for Service Detection
+nmap --script=banner $target_ip
+nmap --script=banner $domain
+nmap --script=http-title $target_ip
+nmap --script=http-title $domain
+nmap --script=firewall-bypass $target_ip
+nmap --script=firewall-bypass $domain
+
+#### Nmap Scripting Engine (NSE) for Vulnerability Detection
+nmap --script=data/vulscan.nse $target_ip
+nmap --script=data/vulscan.nse $domain
+nmap --script=exploit $target_ip
+nmap --script=exploit $domain
+nmap --script=dos $target_ip
+nmap --script=dos $domain
+
+#### Common Scans
+nmap -sP $target_ip/$Port_select
+nmap -sn $target_ip/$Port_select
+nmap -sL $target_ip/$Port_select
+nmap -PS $target_ip
+nmap -PA $target_ip
+nmap -PU $target_ip
+nmap -PY $target_ip
+
+#### No Trace Scans
+nmap -sA $target_ip
+nmap -sW $target_ip
+nmap -sM $target_ip
+nmap -sN $target_ip
+nmap -sF $target_ip
+nmap -sX $target_ip

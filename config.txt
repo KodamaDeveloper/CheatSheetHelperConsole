@@ -1,0 +1,10 @@
+author_name=KOdDEv
+user_name=KOdy
+greeting_message=Assistant for pentesting!
+main_color=#355C7D
+highlight_color=#6C5B7B
+error_color=#C06C84
+info_color=#F67280
+success_color=#F8B195
+warning_color=#355C7D
+option_color=#99B898

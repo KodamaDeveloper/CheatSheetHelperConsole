@@ -1,0 +1,4 @@
+## Path Discovery
+ffuf -w <dictionary> -u http://$domain/FUZZ -v
+gobuster dir -u http://$target_ip -w <dictionary> -x php,txt,html
+dirb http://$target_ip <dictionary>

@@ -1,0 +1,233 @@
+#### Enumerate WordPress users
+wpscan --url $target_url --enumerate u
+
+#### Scan WordPress plugins
+wpscan --url $target_url --enumerate p
+
+#### Scan WordPress themes
+wpscan --url $target_url --enumerate t
+
+#### Scan WordPress vulnerabilities
+wpscan --url $target_url --enumerate vp
+
+#### Brute force WordPress login
+wpscan --url $target_url --passwords data/passwords.txt --usernames admin
+
+#### Joomla
+#### Enumerate Joomla users
+joomscan --url $target_url
+
+#### Scan Joomla components
+joomscan --url $target_url --enumerate c
+
+#### Scan Joomla vulnerabilities
+joomscan --url $target_url --enumerate v
+
+#### Drupal
+#### Scan Drupal for vulnerabilities
+droopescan scan drupal -u $target_url
+
+#### Enumerate Drupal users
+drush -r $target_url user-information
+
+#### Scan Drupal modules
+droopescan scan drupal -u $target_url --enumerate m
+
+#### Magento
+#### Scan Magento for vulnerabilities
+magescan scan:$target_url
+
+#### Scan Magento modules
+magescan scan:modules $target_url
+
+#### Scan Magento for security patches
+magescan scan:security $target_url
+
+#### Docker
+#### List Docker containers
+docker ps -a
+
+#### Start a Docker container
+docker start $container_id
+
+#### Stop a Docker container
+docker stop $container_id
+
+#### Remove a Docker container
+docker rm $container_id
+
+#### List Docker images
+docker images
+
+#### Pull a Docker image
+docker pull $image_name
+
+#### Run a Docker container
+docker run -d -p $host_port:$container_port $image_name
+
+#### Execute a command in a running container
+docker exec -it $container_id /bin/bash
+
+#### Kubernetes
+#### List Kubernetes pods
+kubectl get pods
+
+#### Describe a Kubernetes pod
+kubectl describe pod $pod_name
+
+#### List Kubernetes services
+kubectl get services
+
+#### Get logs from a Kubernetes pod
+kubectl logs $pod_name
+
+#### Execute a command in a Kubernetes pod
+kubectl exec -it $pod_name -- /bin/bash
+
+#### Apply a Kubernetes configuration file
+kubectl apply -f $config_file.yaml
+
+#### Delete a Kubernetes pod
+kubectl delete pod $pod_name
+
+#### Jenkins
+#### List Jenkins jobs
+jenkins-jobs --conf $jenkins_config list
+
+#### Create a Jenkins job
+jenkins-jobs --conf $jenkins_config update $job_config.xml
+
+#### Build a Jenkins job
+jenkins-jobs --conf $jenkins_config build $job_name
+
+#### Get Jenkins job console output
+jenkins-jobs --conf $jenkins_config console $job_name
+
+#### Delete a Jenkins job
+jenkins-jobs --conf $jenkins_config delete $job_name
+
+#### Ansible
+#### Run an Ansible playbook
+ansible-playbook -i $inventory_file $playbook.yaml
+
+#### List Ansible hosts
+ansible all -i $inventory_file --list-hosts
+
+#### Ping Ansible hosts
+ansible all -i $inventory_file -m ping
+
+#### Check Ansible playbook syntax
+ansible-playbook -i $inventory_file $playbook.yaml --syntax-check
+
+#### Execute an Ansible ad-hoc command
+ansible all -i $inventory_file -m shell -a "uptime"
+
+#### Terraform
+#### Initialize a Terraform configuration
+terraform init
+
+#### Plan a Terraform deployment
+terraform plan
+
+#### Apply a Terraform configuration
+terraform apply
+
+#### Destroy a Terraform managed infrastructure
+terraform destroy
+
+#### Show Terraform state
+terraform show
+
+#### Validate Terraform configuration files
+terraform validate
+
+#### Format Terraform configuration files
+terraform fmt
+
+#### AWS CLI
+#### List S3 buckets
+aws s3 ls
+
+#### Upload a file to S3
+aws s3 cp $file_path s3://$bucket_name/$object_name
+
+#### Download a file from S3
+aws s3 cp s3://$bucket_name/$object_name $file_path
+
+#### List EC2 instances
+aws ec2 describe-instances
+
+#### Start an EC2 instance
+aws ec2 start-instances --instance-ids $instance_id
+
+#### Stop an EC2 instance
+aws ec2 stop-instances --instance-ids $instance_id
+
+#### Terminate an EC2 instance
+aws ec2 terminate-instances --instance-ids $instance_id
+
+#### Azure CLI
+#### List resource groups
+az group list
+
+#### Create a resource group
+az group create --name $resource_group_name --location $location
+
+#### List virtual machines
+az vm list
+
+#### Start a virtual machine
+az vm start --name $vm_name --resource-group $resource_group_name
+
+#### Stop a virtual machine
+az vm stop --name $vm_name --resource-group $resource_group_name
+
+#### Delete a virtual machine
+az vm delete --name $vm_name --resource-group $resource_group_name
+
+#### Google Cloud CLI
+#### List projects
+gcloud projects list
+
+#### Set a default project
+gcloud config set project $project_id
+
+#### List compute instances
+gcloud compute instances list
+
+#### Start a compute instance
+gcloud compute instances start $instance_name --zone $zone
+
+#### Stop a compute instance
+gcloud compute instances stop $instance_name --zone $zone
+
+#### Delete a compute instance
+gcloud compute instances delete $instance_name --zone $zone
+
+#### Git
+#### Clone a repository
+git clone $repo_url
+
+#### Initialize a repository
+git init
+
+#### Add changes to staging
+git add $file_name
+
+#### Commit changes
+git commit -m "Commit message"
+
+#### Push changes to remote repository
+git push origin $branch_name
+
+#### Pull changes from remote repository
+git pull origin $branch_name
+
+#### List branches
+git branch -a
+
+#### Create a new branch
+git checkout -b $new_branch_name
+
+#### Merge a branch
+git merge $branch_name

@@ -1,0 +1,172 @@
+#### Connect to MySQL
+mysql -h $target_ip -u $db_user -p
+
+#### Connect to MySQL with database
+mysql -h $target_ip -u $db_user -p $db_name
+
+#### Backup a MySQL database
+mysqldump -h $target_ip -u $db_user -p $db_name > data/$db_name_backup.sql
+
+#### Restore a MySQL database
+mysql -h $target_ip -u $db_user -p $db_name < data/$db_name_backup.sql
+
+#### Show databases
+mysql -h $target_ip -u $db_user -p -e "SHOW DATABASES;"
+
+#### Show tables in a database
+mysql -h $target_ip -u $db_user -p -e "USE $db_name; SHOW TABLES;"
+
+#### PostgreSQL
+#### Connect to PostgreSQL
+psql -h $target_ip -U $db_user -d $db_name
+
+#### Backup a PostgreSQL database
+pg_dump -h $target_ip -U $db_user -d $db_name -F c -b -v -f data/$db_name_backup.dump
+
+#### Restore a PostgreSQL database
+pg_restore -h $target_ip -U $db_user -d $db_name -v data/$db_name_backup.dump
+
+#### Show databases
+psql -h $target_ip -U $db_user -c "\l"
+
+#### Show tables in a database
+psql -h $target_ip -U $db_user -d $db_name -c "\dt"
+
+#### MSSQL
+#### Connect to MSSQL
+sqsh -S $target_ip -U $db_user -P $db_password
+
+#### Backup a MSSQL database
+sqlcmd -S $target_ip -U $db_user -P $db_password -Q "BACKUP DATABASE [$db_name] TO DISK = N'data/$db_name_backup.bak'"
+
+#### Restore a MSSQL database
+sqlcmd -S $target_ip -U $db_user -P $db_password -Q "RESTORE DATABASE [$db_name] FROM DISK = N'data/$db_name_backup.bak'"
+
+#### Show databases
+sqsh -S $target_ip -U $db_user -P $db_password -C "SELECT name FROM sys.databases;"
+
+#### Show tables in a database
+sqsh -S $target_ip -U $db_user -P $db_password -D $db_name -C "SELECT table_name FROM information_schema.tables;"
+
+#### MongoDB
+#### Connect to MongoDB
+mongo $target_ip/$db_name
+
+#### Backup a MongoDB database
+mongodump --host $target_ip --db $db_name --out data/
+
+#### Restore a MongoDB database
+mongorestore --host $target_ip --db $db_name data/$db_name
+
+#### Show databases
+mongo --host $target_ip --eval "db.adminCommand('listDatabases')"
+
+#### Show collections in a database
+mongo --host $target_ip --eval "db.getCollectionNames()" $db_name
+
+#### Redis
+#### Connect to Redis
+redis-cli -h $target_ip
+
+#### Backup a Redis database
+redis-cli -h $target_ip save
+
+#### Restore a Redis database
+scp dump.rdb user@$target_ip:/var/lib/redis/
+
+#### Show keys in Redis
+redis-cli -h $target_ip keys '*'
+
+#### Cassandra
+#### Connect to Cassandra
+cqlsh $target_ip
+
+#### Backup a Cassandra database
+nodetool snapshot $db_name
+
+#### Restore a Cassandra database
+sstableloader -d $target_ip /var/lib/cassandra/data/$db_name
+
+#### Show keyspaces in Cassandra
+cqlsh $target_ip -e "DESCRIBE KEYSPACES;"
+
+#### Show tables in a keyspace
+cqlsh $target_ip -e "DESCRIBE TABLES;" $db_name
+
+#### CouchDB
+#### Connect to CouchDB
+curl http://$db_user:$db_password@$target_ip:5984/_all_dbs
+
+#### Backup a CouchDB database
+curl http://$db_user:$db_password@$target_ip:5984/$db_name > data/$db_name_backup.json
+
+#### Restore a CouchDB database
+curl -X PUT http://$db_user:$db_password@$target_ip:5984/$db_name -d @data/$db_name_backup.json
+
+#### Show databases in CouchDB
+curl http://$db_user:$db_password@$target_ip:5984/_all_dbs
+
+#### Show documents in a database
+curl http://$db_user:$db_password@$target_ip:5984/$db_name/_all_docs
+
+#### Neo4j
+#### Connect to Neo4j
+cypher-shell -u $db_user -p $db_password -a $target_ip
+
+#### Backup a Neo4j database
+neo4j-admin dump --database=$db_name --to=data/$db_name_backup.dump
+
+#### Restore a Neo4j database
+neo4j-admin load --from=data/$db_name_backup.dump --database=$db_name --force
+
+#### Show databases in Neo4j
+cypher-shell -u $db_user -p $db_password -a $target_ip "SHOW DATABASES"
+
+#### Show nodes in Neo4j
+cypher-shell -u $db_user -p $db_password -a $target_ip "MATCH (n) RETURN n"
+
+#### Elasticsearch
+#### Connect to Elasticsearch
+curl -X GET $target_ip:9200
+
+#### Backup an Elasticsearch index
+curl -X PUT $target_ip:9200/_snapshot/$snapshot_repository/$snapshot_name?wait_for_completion=true
+
+#### Restore an Elasticsearch index
+curl -X POST $target_ip:9200/_snapshot/$snapshot_repository/$snapshot_name/_restore
+
+#### Show indices in Elasticsearch
+curl -X GET $target_ip:9200/_cat/indices?v
+
+#### Show documents in an index
+curl -X GET $target_ip:9200/$index_name/_search?pretty
+
+#### Connect to Oracle
+sqlplus $db_user/$db_password@$target_ip/$db_name
+
+#### Backup an Oracle database
+expdp $db_user/$db_password@$target_ip/$db_name directory=data dumpfile=$db_name_backup.dmp
+
+#### Restore an Oracle database
+impdp $db_user/$db_password@$target_ip/$db_name directory=data dumpfile=$db_name_backup.dmp
+
+#### Show tablespaces in Oracle
+sqlplus $db_user/$db_password@$target_ip/$db_name -e "SELECT tablespace_name FROM dba_tablespaces;"
+
+#### Show tables in Oracle
+sqlplus $db_user/$db_password@$target_ip/$db_name -e "SELECT table_name FROM all_tables;"
+
+#### Connect to SQLite
+sqlite3 data/$db_name.db
+
+#### Backup a SQLite database
+sqlite3 data/$db_name.db .backup data/$db_name_backup.db
+
+#### Restore a SQLite database
+sqlite3 data/$db_name.db .restore data/$db_name_backup.db
+
+#### Show tables in SQLite
+sqlite3 data/$db_name.db .tables
+
+#### Show schema of a table in SQLite
+sqlite3 data/$db_name.db .schema $table_name
