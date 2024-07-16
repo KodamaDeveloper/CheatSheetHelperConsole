@@ -1,0 +1,37 @@
+#### Crunch: Generate a dictionary with crunch
+crunch $number1 $number2 -o dictionaries/crunch_8char.txt
+crunch $number1 $number2 $abcdef123 -o dictionaries/crunch_custom.txt
+
+#### CeWL: Create a custom wordlist from a website
+cewl http://example.com -w dictionaries/cewl_example.txt
+
+#### John the Ripper: Extract words from a file for wordlist
+john --wordlist=dictionaries/john_wordlist.txt --rules --stdout > dictionaries/john_rules.txt
+
+#### Wordlists Package: Copy default Kali Linux wordlists
+cp /usr/share/wordlists/rockyou.txt.gz dictionaries/rockyou.txt.gz
+cp /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt dictionaries/directory-list-2.3-medium.txt
+
+#### Wyd: Generate a wordlist from a website
+wyd -t $domain -o dictionaries/wyd_domain.txt
+
+#### CUPP: Common User Passwords Profiler
+cupp -i -o dictionaries/cupp_custom.txt
+
+#### Mentalist: Create custom wordlists
+mentalist -o dictionaries/mentalist_wordlist.txt
+
+#### SecLists: Download SecLists repository
+git clone https://github.com/danielmiessler/SecLists.git dictionaries/SecLists
+
+#### FuzzDB: Download FuzzDB repository
+git clone https://github.com/fuzzdb-project/fuzzdb.git dictionaries/fuzzdb
+
+#### Weakpass: Download weakpass dictionary
+wget -O dictionaries/weakpass_2a.gz https://weakpass.com/wordlist/1234
+
+#### Probable-Wordlists: Download probable-wordlists repository
+git clone https://github.com/berzerk0/Probable-Wordlists.git dictionaries/Probable-Wordlists
+
+#### HashesOrg2019: Download HashesOrg2019 wordlist
+wget -O dictionaries/hashesorg2019.txt.gz https://github.com/hashcat/hashcat/releases/download/v5.1.0/hashcat-5.1.0.7z

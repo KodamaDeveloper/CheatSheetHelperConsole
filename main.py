@@ -14,11 +14,9 @@ import time
 import random
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
 from rich.prompt import Prompt, IntPrompt
 from rich.progress import track
 from importlib import import_module
-import glob
 
 console = Console()
 
@@ -69,32 +67,25 @@ def generate_random_session_name():
 
 def initialize_memory(session_name):
     memory = {}
-    vpn_process = manage_vpn_connections()
-    if vpn_process:
-        memory['vpn_process'] = vpn_process.pid
-        memory['target_ip'] = Prompt.ask(f"[bold {config['main_color']}]Enter the target IP[/bold {config['main_color']}]")
-        memory['vpn_ip'] = Prompt.ask(f"[bold {config['main_color']}]Enter the VPN IP[/bold {config['main_color']}]")
-        
-        os_choices = {
-            1: 'Windows',
-            2: 'Linux',
-            3: 'macOS',
-            4: 'FreeBSD',
-            5: 'Other'
-        }
-        console.print(Panel(f"[bold {config['main_color']}]Select the target OS:[/bold {config['main_color']}]", title="Operating System"))
-        for idx, os_name in os_choices.items():
-            console.print(f"[bold {config['option_color']}] {idx}. {os_name} [/bold {config['option_color']}]")
-        
-        os_choice = IntPrompt.ask(f"[bold {config['main_color']}]Choose an option (1-5)[/bold {config['main_color']}]", choices=[str(i) for i in os_choices.keys()])
-        memory['os'] = os_choices[os_choice]
+    memory['target_ip'] = Prompt.ask(f"[bold {config['main_color']}]Enter the target IP[/bold {config['main_color']}]")
+    
+    os_choices = {
+        1: 'Windows',
+        2: 'Linux',
+        3: 'macOS',
+        4: 'FreeBSD',
+        5: 'Other'
+    }
+    console.print(Panel(f"[bold {config['main_color']}]Select the target OS:[/bold {config['main_color']}]", title="Operating System"))
+    for idx, os_name in os_choices.items():
+        console.print(f"[bold {config['option_color']}] {idx}. {os_name} [/bold {config['option_color']}]")
+    
+    os_choice = IntPrompt.ask(f"[bold {config['main_color']}]Choose an option (1-5)[/bold {config['main_color']}]", choices=[str(i) for i in os_choices.keys()])
+    memory['os'] = os_choices[os_choice]
 
-        memory['domain'] = Prompt.ask(f"[bold {config['main_color']}]Enter the domain (if applicable)[/bold {config['main_color']}]", default="None")
-        save_memory(session_name, memory)
-        return memory
-    else:
-        console.print(f"[bold {config['error_color']}]VPN connection failed. Please check your VPN settings.[/bold {config['error_color']}]")
-        return None
+    memory['domain'] = Prompt.ask(f"[bold {config['main_color']}]Enter the domain (if applicable)[/bold {config['main_color']}]", default="None")
+    save_memory(session_name, memory)
+    return memory
 
 def display_target_info(memory):
     console.print(f"[bold {config['info_color']}]Target Info - IP: {memory.get('target_ip')} | Domain: {memory.get('domain')} | OS: {memory.get('os')}[/bold {config['info_color']}]")
@@ -213,7 +204,7 @@ def manage_memory(session_name, memory):
         console.print(f"[bold {config['option_color']}]6. Add key-value to memory[/bold {config['option_color']}]")
         console.print(f"[bold {config['option_color']}]7. Back to main menu[/bold {config['option_color']}]")
         
-        choice = Prompt.ask(f"[bold {config['main_color']}]Choose an option[/bold {config['main_color']}]")
+        choice = Prompt.ask(f"[bold {config['main_color']}]Choose an option[/bold {config['main_color']}]", choices=[str(i) for i in range(1, 8)])
         if choice == "1":
             show_memory(memory)
         elif choice == "2":
@@ -238,7 +229,7 @@ def manage_memory(session_name, memory):
             if "commands" in memory:
                 for i, cmd in enumerate(memory["commands"], start=1):
                     console.print(f"[bold {config['option_color']}] {i}. {cmd['command']} [/bold {config['option_color']}]")
-                cmd_number = IntPrompt.ask(f"[bold {config['main_color']}]Enter the command number to remove[/bold {config['main_color']}]")
+                cmd_number = IntPrompt.ask(f"[bold {config['main_color']}]Enter the command number to remove[/bold {config['main_color']}]", choices=[str(i) for i in range(1, len(memory["commands"]) + 1)])
                 if 1 <= cmd_number <= len(memory["commands"]):
                     del memory["commands"][cmd_number - 1]
                     save_memory(session_name, memory)
@@ -253,32 +244,6 @@ def manage_memory(session_name, memory):
             break
         else:
             console.print(f"[bold {config['error_color']}]Invalid option, please try again.[/bold {config['error_color']}]")
-
-def manage_vpn_connections():
-    vpn_files = [f for f in os.listdir(VPN_DIR) if f.endswith('.ovpn')]
-    if not vpn_files:
-        console.print(f"[bold {config['error_color']}]No VPN configuration files found in the vpn directory.[/bold {config['error_color']}]")
-        return None
-
-    console.print(f"[bold {config['info_color']}]Available VPN configurations:[/bold {config['info_color']}]")
-    for i, vpn_file in enumerate(vpn_files, start=1):
-        console.print(f"[bold {config['option_color']}] {i}. {vpn_file} [/bold {config['option_color']}]")
-
-    choice = IntPrompt.ask(f"[bold {config['main_color']}]Choose a VPN configuration to use by number[/bold {config['main_color']}]", choices=[str(i) for i in range(1, len(vpn_files) + 1)])
-    selected_vpn = vpn_files[choice - 1]
-
-    console.print(f"[bold {config['info_color']}]Starting VPN connection using {selected_vpn}...[/bold {config['info_color']}]")
-    vpn_path = os.path.join(VPN_DIR, selected_vpn)
-    vpn_process = subprocess.Popen(['openvpn', vpn_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    time.sleep(10)  # Give time for the VPN to connect
-
-    if vpn_process.poll() is None:
-        console.print(f"[bold {config['success_color']}]VPN connection established using {selected_vpn}.[/bold {config['success_color']}]")
-        return vpn_process
-    else:
-        console.print(f"[bold {config['error_color']}]Failed to establish VPN connection using {selected_vpn}.[/bold {config['error_color']}]")
-        return None
 
 def list_dictionaries():
     dictionaries = [f for f in os.listdir(DICTIONARY_DIR) if f.endswith('.txt')]
@@ -316,8 +281,8 @@ def execute_cheatsheet_command(session_name, memory):
 
     for line in cheatsheet:
         line = line.strip()
-        if line.startswith('##'):
-            current_category = line[2:].strip()
+        if line.startswith('####'):
+            current_category = line[4:].strip()
             categories[current_category] = []
         elif current_category and line:
             categories[current_category].append(line)
@@ -350,7 +315,7 @@ def execute_cheatsheet_command(session_name, memory):
     for placeholder in placeholders:
         value = memory.get(placeholder, None)
         if not value:
-            value = Prompt.ask(f"[bold {config['main_color']}]Enter value for {placeholder}[/bold {config['main_color']}]")
+            value = Prompt.ask(f"[bold {config['main_color']}]Enter value for {placeholder}[/bold {config['main_color']}]", default="")
             memory[placeholder] = value
             save_memory(session_name, memory)
         selected_command = selected_command.replace(f'${placeholder}', value)
@@ -369,15 +334,11 @@ def manage_sessions():
     if choice == 0:
         session_name = Prompt.ask(f"[bold {config['main_color']}]Enter the session name[/bold {config['main_color']}]", default=generate_random_session_name())
         memory = initialize_memory(session_name)
-        if memory is None:
-            return
     else:
         session_name = sessions[choice - 1]
         memory = load_memory(session_name)
-        vpn_process = manage_vpn_connections()
-        if vpn_process:
-            memory['vpn_process'] = vpn_process.pid
-            save_memory(session_name, memory)
+
+    return session_name, memory
 
 def export_session_to_sh(session_name, memory):
     export_path = os.path.join('plugins/scripts/sh', f"{session_name}_export.sh")
@@ -385,7 +346,6 @@ def export_session_to_sh(session_name, memory):
         file.write("#!/bin/bash\n\n")
         file.write(f"# Session: {session_name}\n")
         file.write(f"# Target IP: {memory.get('target_ip')}\n")
-        file.write(f"# VPN IP: {memory.get('vpn_ip')}\n")
         file.write(f"# OS: {memory.get('os')}\n")
         file.write(f"# Domain: {memory.get('domain')}\n\n")
         if "commands" in memory:
@@ -415,34 +375,16 @@ def load_random_ascii():
             return file.read()
     return None
 
+def change_target_ip(session_name, memory):
+    new_target_ip = Prompt.ask(f"[bold {config['main_color']}]Enter the new target IP[/bold {config['main_color']}]")
+    memory['target_ip'] = new_target_ip
+    save_memory(session_name, memory)
+    console.print(f"[bold {config['success_color']}]Target IP changed to {new_target_ip}[/bold {config['success_color']}]")
+
 def main_menu():
     add_author()
-    sessions = [f.replace('_memory.json', '') for f in os.listdir(DATA_DIR) if f.endswith('_memory.json')]
-    
-    if sessions:
-        console.print(f"[bold {config['info_color']}]Available sessions:[/bold {config['info_color']}]")
-        for i, session in enumerate(sessions, start=1):
-            console.print(f"[bold {config['option_color']}] {i}. {session} [/bold {config['option_color']}]")
+    session_name, memory = manage_sessions()
 
-        choice = IntPrompt.ask(f"[bold {config['main_color']}]Choose a session to load or 0 to create a new session[/bold {config['main_color']}]", choices=[str(i) for i in range(len(sessions) + 1)] + ['0'])
-        if choice == 0:
-            session_name = Prompt.ask(f"[bold {config['main_color']}]Enter the session name[/bold {config['main_color']}]", default=generate_random_session_name())
-            memory = initialize_memory(session_name)
-            if memory is None:
-                return
-        else:
-            session_name = sessions[choice - 1]
-            memory = load_memory(session_name)
-            vpn_process = manage_vpn_connections()
-            if vpn_process:
-                memory['vpn_process'] = vpn_process.pid
-                save_memory(session_name, memory)
-    else:
-        session_name = Prompt.ask(f"[bold {config['main_color']}]Enter the session name[/bold {config['main_color']}]", default=generate_random_session_name())
-        memory = initialize_memory(session_name)
-        if memory is None:
-            return
-    
     while True:
         ascii_art = load_random_ascii()
         if ascii_art:
@@ -460,11 +402,11 @@ def main_menu():
         console.print(f"[bold {config['option_color']}]8. Check target availability[/bold {config['option_color']}]")
         console.print(f"[bold {config['option_color']}]9. List and execute scripts[/bold {config['option_color']}]")
         console.print(f"[bold {config['option_color']}]10. Export session to shell script[/bold {config['option_color']}]")
-        console.print(f"[bold {config['option_color']}]11. Manage VPN connections[/bold {config['option_color']}]")
-        console.print(f"[bold {config['option_color']}]12. Manage sessions[/bold {config['option_color']}]")
+        console.print(f"[bold {config['option_color']}]11. Manage sessions[/bold {config['option_color']}]")
+        console.print(f"[bold {config['option_color']}]12. Change target IP[/bold {config['option_color']}]")
         console.print(f"[bold {config['option_color']}]0. Exit[/bold {config['option_color']}]")
         
-        choice = Prompt.ask(f"[bold {config['main_color']}]Choose an option[/bold {config['main_color']}]")
+        choice = Prompt.ask(f"[bold {config['main_color']}]Choose an option[/bold {config['main_color']}]", choices=[str(i) for i in range(14)])
         if choice == "1":
             execute_cheatsheet_command(session_name, memory)
         elif choice == "2":
@@ -488,12 +430,9 @@ def main_menu():
         elif choice == "10":
             export_session_to_sh(session_name, memory)
         elif choice == "11":
-            vpn_process = manage_vpn_connections()
-            if vpn_process:
-                memory['vpn_process'] = vpn_process.pid
-                save_memory(session_name, memory)
+            session_name, memory = manage_sessions()
         elif choice == "12":
-            manage_sessions()
+            change_target_ip(session_name, memory)
         elif choice == "0":
             console.print(Panel(f"[bold {config['main_color']}]Exiting the program...[/bold {config['main_color']}]"))
             break
