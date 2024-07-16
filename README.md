@@ -5,6 +5,8 @@
 ## Overview
 An intelligent assistant designed for penetration testers. It facilitates various pentesting tasks, including command execution, plugin management, VPN connection handling, and cheatsheet usage. This guide explains how to use the program, manage sessions, execute commands from cheatsheets, create plugins, and customize the tool.
 
+Automatic /etc/hosts with ip and domain.
+
 ## Features
 
 - Command execution and history
