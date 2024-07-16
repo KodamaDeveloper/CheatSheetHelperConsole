@@ -78,7 +78,7 @@ Execute new commands and view command history.
 
 ## Creating a Plugin
 
-To extend the functionality of AsheOfVoid, you can create custom plugins. Plugins are Python scripts stored in the `plugins` directory. Each plugin must have a `run(memory)` function that will be executed when the plugin is selected.
+To extend the functionality, you can create custom plugins. Plugins are Python scripts stored in the `plugins` directory. Each plugin must have a `run(memory)` function that will be executed when the plugin is selected.
 
 ### Steps to Create a Plugin
 
