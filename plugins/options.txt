@@ -1,5 +1,8 @@
+#### - Automatic action -
 action_nc.py # Improved NC with auto SH or PY
-show_important_info.py # Show important information in memory
 repeater_SH_or_PY.py # Repeater SH or PY
+#### - Session Helper -
+show_important_info.py # Show important information in memory session
+####  - Linux - 
 manage_hosts.py # Hosts File Manager
-check_linux_user_plugin.py # Plugin check local session for Linux
+check_linux_user_plugin.py # Plugin check local session for Linux 

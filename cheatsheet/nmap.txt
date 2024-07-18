@@ -33,9 +33,9 @@ nmap --script=http-enum $domain
 nmap --script=ssl-cert $domain
 
 #### Output Formats
-nmap -oN data/output.txt $target_ip
-nmap -oX data/output.xml $target_ip
-nmap -oA data/output $target_ip
+nmap -oN data/$session_name/output.txt $target_ip
+nmap -oX data/$session_name/output.xml $target_ip
+nmap -oA data/$session_name/output $target_ip
 
 #### Firewall Evasion and Spoofing
 nmap -f $target_ip
@@ -54,7 +54,7 @@ nmap -n $target_ip
 nmap 192.168.1.1
 nmap 192.168.1.1-254
 nmap 192.168.1.0/24
-nmap -iL data/$list_of_ips_txt
+nmap -iL data/$session_name/$list_of_ips_txt
 
 #### Custom Scans
 nmap -sT -p 80,443 $target_ip
@@ -77,7 +77,7 @@ nmap -sV --version-light $target_ip
 nmap -A -T4 $target_ip
 
 #### Scan and Save Output in All Formats
-nmap -oA data/full_scan $target_ip
+nmap -oA data/$session_name/full_scan $target_ip
 
 #### Local Network Scans
 nmap -sP 192.168.1.0/24

@@ -5,6 +5,7 @@ import json
 import re
 from rich.console import Console
 from rich.table import Table
+from rich.panel import Panel
 
 console = Console()
 
@@ -114,7 +115,8 @@ def run(memory):
 if __name__ == "__main__":
     data_dir = 'data'
     session_name = 'ghost'
-    memory_file = os.path.join(data_dir, f'{session_name}_memory.json')
+    session_dir = os.path.join(data_dir, session_name)
+    memory_file = os.path.join(session_dir, f'{session_name}_memory.json')
 
     if os.path.exists(memory_file):
         with open(memory_file, 'r') as file:

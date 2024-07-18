@@ -46,19 +46,24 @@ if os.path.exists(PLUGIN_OPTIONS_FILE):
     with open(PLUGIN_OPTIONS_FILE, 'r') as file:
         for line in file.readlines():
             if line.strip():
-                file_name, description = line.strip().split(' # ', 1)
-                plugin_options[description] = file_name
-
+                if line.startswith('####'):
+                    plugin_options[line.strip()] = None
+                else:
+                    file_name, description = line.strip().split(' # ', 1)
+                    plugin_options[description] = file_name
+                    
 # Memory management
 def load_memory(session_name):
-    memory_file = os.path.join(DATA_DIR, f'{session_name}_memory.json')
+    memory_file = os.path.join(DATA_DIR, session_name, 'memory.json')
     if os.path.exists(memory_file):
         with open(memory_file, 'r') as file:
             return json.load(file)
     return {}
 
 def save_memory(session_name, memory):
-    memory_file = os.path.join(DATA_DIR, f'{session_name}_memory.json')
+    session_dir = os.path.join(DATA_DIR, session_name)
+    os.makedirs(session_dir, exist_ok=True)
+    memory_file = os.path.join(session_dir, 'memory.json')
     with open(memory_file, 'w') as file:
         json.dump(memory, file, indent=4)
 
@@ -67,6 +72,7 @@ def generate_random_session_name():
 
 def initialize_memory(session_name):
     memory = {}
+    memory['session_name'] = session_name
     memory['target_ip'] = Prompt.ask(f"[bold {config['main_color']}]Enter the target IP[/bold {config['main_color']}]")
     
     os_choices = {
@@ -88,7 +94,7 @@ def initialize_memory(session_name):
     return memory
 
 def display_target_info(memory):
-    console.print(f"[bold {config['info_color']}]Target Info - IP: {memory.get('target_ip')} | Domain: {memory.get('domain')} | OS: {memory.get('os')}[/bold {config['info_color']}]")
+    console.print(f"[bold {config['info_color']}]Target Info - IP: {memory.get('target_ip')} | Domain: {memory.get('domain')} | OS: {memory.get('os')} | Session: {memory.get('session_name')}[/bold {config['info_color']}]")
 
 def check_target_availability(memory):
     target_ip = memory.get('target_ip')
@@ -145,17 +151,36 @@ def list_plugins(session_name, memory):
         return
     
     console.print(f"[bold {config['info_color']}]Available plugins:[/bold {config['info_color']}]")
-    
-    for i, (description, file_name) in enumerate(plugin_options.items(), start=1):
-        console.print(f"[bold {config['option_color']}] {i}. {description} [/bold {config['option_color']}]")
-    
-    choice = IntPrompt.ask(f"[bold {config['main_color']}]Choose a plugin to execute or 0 to go back[/bold {config['main_color']}]", choices=[str(i) for i in range(1, len(plugin_options) + 1)] + ['0'])
-    if choice != 0:
-        index = int(choice) - 1
-        description = list(plugin_options.keys())[index]
-        plugin_name = plugin_options[description]
-        run_plugin(session_name, memory, plugin_name)
 
+    categories = {}
+    current_category = None
+    for description, file_name in plugin_options.items():
+        if description.startswith("####"):
+            current_category = description[4:].strip()
+            categories[current_category] = []
+        elif current_category:
+            categories[current_category].append((description, file_name))
+        else:
+            categories['Uncategorized'] = categories.get('Uncategorized', [])
+            categories['Uncategorized'].append((description, file_name))
+
+    plugin_index = 1
+    plugin_map = {}
+    for category, plugins in categories.items():
+        console.print(f"\n[bold {config['main_color']}]#### {category}[/bold {config['main_color']}]")
+        for description, file_name in plugins:
+            console.print(f"[bold {config['option_color']}] {plugin_index}. {description} [/bold {config['option_color']}]")
+            plugin_map[plugin_index] = file_name
+            plugin_index += 1
+
+    choice = IntPrompt.ask(
+        f"[bold {config['main_color']}]Choose a plugin to execute or 0 to go back[/bold {config['main_color']}]",
+        choices=[str(i) for i in range(1, plugin_index)] + ['0']
+    )
+    if choice != 0:
+        plugin_name = plugin_map[choice]
+        run_plugin(session_name, memory, plugin_name)
+        
 def run_plugin(session_name, memory, plugin_name):
     try:
         plugin = import_module(f'plugins.{plugin_name[:-3]}')  # Removing .py extension
@@ -183,8 +208,8 @@ def search_commands(memory):
         console.print(f"[bold {config['error_color']}]No matching commands found.[/bold {config['error_color']}]")
 
 def show_memory(memory):
-    console.print(Panel(f"[bold {config['info_color']}]Memory Contents[/bold {config['info_color']}]"))
-    console.print(json.dumps(memory, indent=4))
+    memory_str = json.dumps(memory, indent=4)
+    console.print(Panel(memory_str, title="Memory Contents", subtitle=f"Session: {memory.get('session_name')}", border_style="green"))
 
 def add_key_value_to_memory(session_name, memory):
     key = Prompt.ask(f"[bold {config['main_color']}]Enter the key to add[/bold {config['main_color']}]")
@@ -324,7 +349,7 @@ def execute_cheatsheet_command(session_name, memory):
     execute_command(session_name, memory, selected_command)
 
 def manage_sessions():
-    sessions = [f.replace('_memory.json', '') for f in os.listdir(DATA_DIR) if f.endswith('_memory.json')]
+    sessions = [f for f in os.listdir(DATA_DIR) if os.path.isdir(os.path.join(DATA_DIR, f))]
     
     console.print(f"[bold {config['info_color']}]Available sessions:[/bold {config['info_color']}]")
     for i, session in enumerate(sessions, start=1):
@@ -341,7 +366,9 @@ def manage_sessions():
     return session_name, memory
 
 def export_session_to_sh(session_name, memory):
-    export_path = os.path.join('plugins/scripts/sh', f"{session_name}_export.sh")
+    session_dir = os.path.join(DATA_DIR, session_name)
+    os.makedirs(session_dir, exist_ok=True)
+    export_path = os.path.join(session_dir, f"{session_name}_export.sh")
     with open(export_path, 'w') as file:
         file.write("#!/bin/bash\n\n")
         file.write(f"# Session: {session_name}\n")
